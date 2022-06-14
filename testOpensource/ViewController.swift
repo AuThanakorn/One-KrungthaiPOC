@@ -30,9 +30,8 @@ class ViewController: UIViewController {
     var fileRepository : AmityFileRepository?
     /// Login Button
     @IBAction func LoginButton(_ sender: Any) {
-       login(userID: "auTest2",displayName: "auTest2")
-//
-//        AmityUIKitManager.registerDevice(withUserId: "auTest2", displayName: "auTest2")
+       login(userID: "johnwick2",displayName: "johnwick2")
+ // AmityUIKitManager.registerDevice(withUserId: "johnwick2", displayName: "johnwick2")
     }
     /// Create community channel button
     @IBAction func createCommunityButton(_ sender: Any) {
@@ -52,17 +51,33 @@ class ViewController: UIViewController {
     }
 
     @IBAction func addMemberButton(_ sender: Any) {
+ 
        createConversationChannel(chanelID: "Woohoo", listOfUserID: ["johnwick2","auTest2"], channelName: "johnwick2-auTest2")
     }
     /// Send text button
     @IBAction func sendText(_ sender: Any) {
-        token?.invalidate();
-        print("invalidate token")
+        
+        let vc = AmityPostTargetPickerViewController.make(postContentType: .post)
+      guard let window = UIApplication.shared.windows.filter({$0.isKeyWindow}).first else { return  }
+          
+          let navController = UINavigationController(rootViewController: vc)
+          
+          navController.modalPresentationStyle = .fullScreen
+          
+          window.rootViewController = navController
+        let url = URL(string: "creaturlpost://")
+
+        UIApplication.shared.open(url!) { (result) in
+            if result {
+               // The URL was delivered successfully!
+            }
+        }
             }
 
     /// button for observe message within channel
     @IBAction func observeChannel(_ sender: Any) {
-        quryCommunityChannel()
+        postQueryExample();
+//        quryCommunityChannel()
 //        updateChannelMetadata()
 //        joinChannel(channelId: "6273dc8053c74600daf4ba9f")
 //        queryMessage(channelId: "6273dc8053c74600daf4ba9f")
@@ -141,10 +156,10 @@ class ViewController: UIViewController {
         }
     }
     func postQueryExample() {
-        joinChannel(channelId: "8bf278c954cdbdbe44908865e6b51217")
+       
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         let feedCollection = feedRepository?.getCommunityFeed(
-              withCommunityId: "8bf278c954cdbdbe44908865e6b51217",
+              withCommunityId: "624593fb40222100d9d3c314",
               sortBy: .lastCreated,
               includeDeleted: false,
               feedType: .published
@@ -155,21 +170,14 @@ class ViewController: UIViewController {
                 print("loading")
             }
             if collection.loadingStatus == .loaded {
-                print(collection.loadingStatus.rawValue)
-                print(collection.dataStatus.rawValue)
                 if let error = error {
                     print(error)
                 }
                 else{
                     for i in 0..<collection.count(){
-                        let pollID = collection.object(at: i)?.getPollInfo()?.voteCount
-                        if (pollID != nil){
-                          
-                        let content  = collection.object(at: i)?.data?["text"]
+                        let post = collection.object(at: i)
                         
-                        print("\(String(describing: pollID))--\(content)")
-                        
-                        }
+                        print(post?.getPollInfo()?.voteCount)
                     }
             }
             }
@@ -234,6 +242,8 @@ class ViewController: UIViewController {
             
         }
     }
+    
+   
 
     func queryCommunityPost(withId id: String) {
         let communityRepository = AmityCommunityRepository(client: AmityUIKitManager.client)
